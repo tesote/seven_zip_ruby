@@ -6,12 +6,15 @@ require 'seven_zip_ruby/version'
 Gem::Specification.new do |spec|
   spec.name          = "seven_zip_ruby"
   spec.version       = SevenZipRuby::VERSION
-  spec.authors       = ["Masamitsu MURASE"]
-  spec.email         = ["masamitsu.murase@gmail.com"]
+  spec.authors       = ["Masamitsu MURASE", "Tesote Engineering"]
+  spec.email         = ["masamitsu.murase@gmail.com", "engineering@tesote.com"]
   spec.description   = %q{SevenZipRuby (seven_zip_ruby) is a ruby gem library to read and write 7zip archives. This gem library calls official 7z.dll internally.}
   spec.summary       = %q{This is a ruby gem library to read and write 7zip files.}
-  spec.homepage      = "https://github.com/masamitsu-murase/seven_zip_ruby"
+  spec.homepage      = "https://github.com/tesote/seven_zip_ruby"
   spec.license       = "LGPL + unRAR"
+
+  spec.metadata['allowed_push_host'] = 'https://gem.fury.io/tesote'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 
   spec.files         = `git ls-files`.split($/).select{ |i| !(i.start_with?("pkg") || i.start_with?("resources")) }
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

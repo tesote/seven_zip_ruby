@@ -1,0 +1,52 @@
+name: Release to Gemfury
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/seven_zip_ruby/version.rb'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: Build and publish gem
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect version change
+        id: version
+        run: |
+          VERSION=$(ruby -r./lib/seven_zip_ruby/version.rb -e "puts SevenZipRuby::VERSION")
+          echo "current=$VERSION" >> $GITHUB_OUTPUT
+
+          if git diff HEAD^ HEAD --name-only | grep -q "lib/seven_zip_ruby/version.rb"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "📦 Version changed to: $VERSION"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Ruby
+        if: steps.version.outputs.changed == 'true'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.7
+          bundler-cache: true
+
+      - name: Build gem
+        if: steps.version.outputs.changed == 'true'
+        run: |
+          gem build seven_zip_ruby.gemspec
+          echo "✅ Built: $(ls *.gem)"
+
+      - name: Publish to Gemfury
+        if: steps.version.outputs.changed == 'true'
+        env:
+          FURY_TOKEN: ${{ secrets.GEMFURY_PUSH_TOKEN }}
+        run: |
+          GEM_FILE=$(ls *.gem)
+          curl -f -F package=@"$GEM_FILE" "https://${FURY_TOKEN}@push.fury.io/tesote/"
+          echo "✅ Published $GEM_FILE to Gemfury"
